@@ -14,18 +14,18 @@
       "Type": "String",
       "Description": "The key pair that is allowed SSH access"
     }
-  }, 
+  },
   "Resources": {
     "EC2Instance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId": "ami-75a38416",
+        "ImageId": "ami-dd104dbd",
         "InstanceType": "t2.micro",
         "SubnetId": { "Ref": "SubnetId" },
         "KeyName": { "Ref": "KeyName" },
         "SecurityGroupIds": [ { "Ref": "EC2InstanceSecurityGroup" } ],
         "IamInstanceProfile": { "Ref": "EC2InstanceProfile" },
-        "UserData" : { 
+        "UserData" : {
           "Fn::Base64" : { "Fn::Join" : ["", [
             "#!/bin/bash\n",
             "echo ECS_CLUSTER=", { "Ref" : "EcsCluster" }, " >> /etc/ecs/ecs.config\n",
@@ -33,7 +33,7 @@
             "useradd -u 1000 -g jenkins jenkins\n",
             "mkdir -p /ecs/jenkins_home\n",
             "chown -R jenkins:jenkins /ecs/jenkins_home\n"
-          ] ] } 
+          ] ] }
         },
         "Tags": [ { "Key": "Name", "Value": { "Fn::Join": ["", [ { "Ref": "AWS::StackName" }, "-instance" ] ] } } ]
       }
@@ -44,15 +44,15 @@
         "GroupDescription": "Jenkins Ingress Access",
         "VpcId": { "Ref": "VpcId" },
         "SecurityGroupIngress": [
-          { 
-            "IpProtocol" : "tcp", 
-            "FromPort" : "8080", 
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "8080",
             "ToPort" : "8080",
-            "SourceSecurityGroupId" : { "Ref" : "ElbSecurityGroup" } 
+            "SourceSecurityGroupId" : { "Ref" : "ElbSecurityGroup" }
           },
-          { 
-            "IpProtocol" : "tcp", 
-            "FromPort" : "22", 
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "22",
             "ToPort" : "22",
             "CidrIp" : "0.0.0.0/0"
           }
@@ -81,7 +81,7 @@
           ]
         },
         "Path": "/",
-        "ManagedPolicyArns": [ 
+        "ManagedPolicyArns": [
           "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
           "arn:aws:iam::aws:policy/AdministratorAccess"
         ]
@@ -93,9 +93,9 @@
         "GroupDescription": "Jenkins ELB Ingress Access",
         "VpcId": { "Ref": "VpcId" },
         "SecurityGroupIngress": [
-          { 
-            "IpProtocol" : "tcp", 
-            "FromPort" : "80", 
+          {
+            "IpProtocol" : "tcp",
+            "FromPort" : "80",
             "ToPort" : "80",
             "CidrIp": "0.0.0.0/0"
           }
@@ -108,7 +108,7 @@
       "Properties": {
         "CrossZone": "false",
         "SecurityGroups" : [ { "Ref": "ElbSecurityGroup" } ],
-        "Listeners" : [ 
+        "Listeners" : [
           {
             "LoadBalancerPort" : "80",
             "InstancePort" : "8080",
@@ -125,7 +125,7 @@
     "EcsTaskDefinition": {
       "Type" : "AWS::ECS::TaskDefinition",
       "Properties" : {
-        "ContainerDefinitions" : [ 
+        "ContainerDefinitions" : [
           {
             "Name": "jenkins",
             "Image": "jmenga/jenkins:ecs",
@@ -143,8 +143,8 @@
             ]
           }
         ],
-        "Volumes" : [ 
-          { 
+        "Volumes" : [
+          {
             "Name": "jenkins_home",
             "Host": { "SourcePath": "/ecs/jenkins_home" }
           },
